@@ -141,15 +141,14 @@ static inline void domain_unregister(struct ll_schedule_domain *domain,
 	assert(domain->ops->domain_unregister);
 
 	/* unregistering a task, decrement the count */
-	if (task)
-		atomic_sub(&domain->total_num_tasks, 1);
+	atomic_sub(&domain->total_num_tasks, 1);
 
 	/*
 	 * In some cases .domain_unregister() might not return, terminating the
 	 * current thread, that's why we had to update state before calling it.
 	 */
 	ret = domain->ops->domain_unregister(domain, task, num_tasks);
-	if (ret < 0 && task)
+	if (ret < 0)
 		/* Failed to unregister the domain, restore state */
 		atomic_add(&domain->total_num_tasks, 1);
 }
